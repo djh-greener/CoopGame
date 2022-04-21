@@ -24,10 +24,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	TMap<FName,TArray<ABuff*>>BuffTable{
-		{"Active",TArray<ABuff*>()},
-		{"Stable",TArray<ABuff*>()}
-	};
+	
+	TArray<ABuff*>ActiveBuffs;
+	
+	TArray<ABuff*>StableBuffs;
 	
 };

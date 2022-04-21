@@ -71,7 +71,7 @@ protected://武器，开火相关
 	UPROPERTY(VisibleDefaultsOnly,Category="Weapon")
 	FName WeaponAttachSocketName;
 	
-public://Buff相关
+public://Buff相关 //组件指针不必设Replicated,会自动同步
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Buff")
 	class UBuffManager*BuffManager;
 	

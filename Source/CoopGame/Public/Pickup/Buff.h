@@ -26,12 +26,19 @@ public:
 	//Manager激活
 	void ActivateBuff();
 
+	UPROPERTY(ReplicatedUsing=OnRep_ChangeBuffState)
 	EBuffState BuffState;
 
+	UFUNCTION()
+	void OnRep_ChangeBuffState();
+
+	UFUNCTION(BlueprintImplementableEvent,Category="Buff")
+	void OnBuffStateChanged(EBuffState NewBuffState);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//计数函数
 	void TickCounter();
 protected:
-	virtual void BeginPlay() override;
 	
 	//Buff的每次实际效果
 	UFUNCTION(BlueprintImplementableEvent, Category="Buff")

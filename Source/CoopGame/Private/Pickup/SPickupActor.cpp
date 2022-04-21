@@ -11,6 +11,7 @@
 #include "GameFramework/Character.h"
 #include "Pickup/Buff.h"
 #include "Components/PointLightComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASPickupActor::ASPickupActor()
@@ -26,17 +27,23 @@ ASPickupActor::ASPickupActor()
 
 	StaticMeshComp=CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	StaticMeshComp->SetIsReplicated(true);
 	StaticMeshComp->SetupAttachment(RootComponent);
 
 	PointLightComp=CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLightComp"));
 	PointLightComp->SetupAttachment(StaticMeshComp);
+
+	SetReplicates(true);//原本就放置在场景中的Actor也会复制吗，会不会导致客户端产生两份
 }
 
 // Called when the game starts or when spawned
 void ASPickupActor::BeginPlay()
 {
 	Super::BeginPlay();
-	ReSpawn();
+	if (GetLocalRole()==ROLE_Authority)
+	{
+		ReSpawn();
+	}
 }
 
 void ASPickupActor::ReSpawn()
@@ -57,14 +64,18 @@ void ASPickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 	Super::NotifyActorBeginOverlap(OtherActor);
 	ASCharacter*PP=Cast<ASCharacter>(OtherActor);
 	
-	if (PP){
-		if (BuffInst){
-			PP->BuffManager->BuffTable["Active"].Add(BuffInst);
-			StaticMeshComp->SetVisibility(false);
-			BuffInst=nullptr;
-			GetWorldTimerManager().SetTimer(TimerHandle_ReSpawnTimer,this,&ASPickupActor::ReSpawn,CoolDownDuration);
-		}
+	if (GetLocalRole()==ROLE_Authority&&PP&&BuffInst){
+		PP->BuffManager->ActiveBuffs.Add(BuffInst);
+		StaticMeshComp->SetVisibility(false);
+		BuffInst=nullptr;
+		GetWorldTimerManager().SetTimer(TimerHandle_ReSpawnTimer,this,&ASPickupActor::ReSpawn,CoolDownDuration);
 	}
+}
+
+void ASPickupActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASPickupActor,BuffInst);
 }
 
 

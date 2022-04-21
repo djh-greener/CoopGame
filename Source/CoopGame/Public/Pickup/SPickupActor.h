@@ -36,6 +36,7 @@ protected:
 	UPROPERTY(EditInstanceOnly,Category="PickupActor")
 	TSubclassOf<class ABuff>BuffClass;
 
+	UPROPERTY(Replicated)
 	ABuff*BuffInst;
 	
 	UPROPERTY(EditInstanceOnly,Category="PickupActor")
@@ -46,6 +47,6 @@ protected:
 	void ReSpawn();
 public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 };
