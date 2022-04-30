@@ -2,6 +2,7 @@
 
 
 #include "Components/BuffManager.h"
+#include "SCharacter.h"
 
 // Sets default values for this component's properties
 UBuffManager::UBuffManager()
@@ -10,7 +11,7 @@ UBuffManager::UBuffManager()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	SetIsReplicated(true);
+	//SetIsReplicated(true);
 }
 
 // Called when the game starts
@@ -42,7 +43,8 @@ void UBuffManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		TmpBuffGroup.Add(it);
 	for (auto it:TmpBuffGroup)
 	{
-		it->ActivateBuff();
+		ASCharacter*Player=Cast<ASCharacter>(GetOwner());
+		it->ActivateBuff(Player);
 		ActiveBuffs.Remove(it);
 		StableBuffs.Add(it);
 	}

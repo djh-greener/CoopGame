@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/Actor.h"
 #include "Buff.generated.h"
 
@@ -14,6 +15,8 @@ enum class EBuffState:uint8
 	Destroy
 };
 
+class ASCharacter;
+
 UCLASS()
 class COOPGAME_API ABuff : public AActor
 {
@@ -24,25 +27,24 @@ public:
 	ABuff();
 
 	//Manager激活
-	void ActivateBuff();
+	void ActivateBuff(ASCharacter*Player);
 
-	UPROPERTY(ReplicatedUsing=OnRep_ChangeBuffState)
+	UPROPERTY()
 	EBuffState BuffState;
-
-	UFUNCTION()
-	void OnRep_ChangeBuffState();
 
 	UFUNCTION(BlueprintImplementableEvent,Category="Buff")
 	void OnBuffStateChanged(EBuffState NewBuffState);
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//计数函数
 	void TickCounter();
 protected:
+	//作用对象
+	ASCharacter*BuffObject;
 	
 	//Buff的每次实际效果
 	UFUNCTION(BlueprintImplementableEvent, Category="Buff")
-	void TickBuff();
+	void TickBuff(ASCharacter* Player);
 
 	//Buff总生效次数
 	UPROPERTY(EditAnywhere, Category="Buff")

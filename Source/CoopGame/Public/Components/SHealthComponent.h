@@ -32,7 +32,7 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="HealthComponent")
 	float DefaultHealth;
-	//
+	
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 		class AController* InstigatedBy, AActor* DamageCauser);

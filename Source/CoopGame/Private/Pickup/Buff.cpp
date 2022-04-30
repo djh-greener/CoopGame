@@ -2,6 +2,7 @@
 
 
 #include "Pickup/Buff.h"
+#include "SCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -13,26 +14,14 @@ ABuff::ABuff()
 	TickProcessed=0;
 
 	BuffState=EBuffState::Active;
-	SetReplicates(true);
+	//SetReplicates(true);
 }
 
-void ABuff::ActivateBuff()
+void ABuff::ActivateBuff(ASCharacter*Player)//此函数只在服务器被调用
 {
 	GetWorldTimerManager().SetTimer(TimerHandle,this,&ABuff::TickCounter,TickInterval,true,0);
-	BuffState=EBuffState::Stable;//客户端收到OnRep调用
-	OnRep_ChangeBuffState();//服务器补充，使两者逻辑相同
-}
-
-void ABuff::OnRep_ChangeBuffState()
-{
-	OnBuffStateChanged(BuffState);
-}
-
-void ABuff::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ABuff,BuffState);
+	BuffState=EBuffState::Stable;
+	BuffObject=Player;
 }
 
 void ABuff::TickCounter()
@@ -40,11 +29,10 @@ void ABuff::TickCounter()
 	if (TickProcessed>=TotalTicks)
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle);
-		BuffState=EBuffState::Destroy;//客户端收到OnRep调用
-		OnRep_ChangeBuffState();//服务器补充，使两者逻辑相同
+		BuffState=EBuffState::Destroy;
 		return;
 	}
-	TickBuff();
+	TickBuff(BuffObject);
 	
 	TickProcessed++;
 }
