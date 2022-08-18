@@ -32,17 +32,21 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="HealthComponent")
 	float DefaultHealth;
-	
+
+	bool bIsDead;
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 		class AController* InstigatedBy, AActor* DamageCauser);
-
-public:
+	
 	UPROPERTY(ReplicatedUsing=On_RepHealth,VisibleDefaultsOnly,BlueprintReadOnly,Category="HealthComponent")
 	float Health;
 	
 	UFUNCTION()
 	void On_RepHealth(float OldHealth);
+public:
+	
+	float GetHealth()const;
+	
 
 	UFUNCTION(BlueprintCallable,Category="HealthComponent")
 	void Heal(float Amount);

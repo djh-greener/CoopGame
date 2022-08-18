@@ -39,6 +39,7 @@ void ASWeapon::Fire()
 	if (GetLocalRole()<ROLE_Authority)
 	{
 		ServerFire();
+		return;
 	}
 	AActor*MyOwner=GetOwner();
 	if(MyOwner)
@@ -66,7 +67,7 @@ void ASWeapon::Fire()
 			float ActualDamage=BaseDamage;
 			if(SurfaceType==SURFACE_FLESHVULNERABLE)ActualDamage*=4;
 			
-			UGameplayStatics::ApplyPointDamage(Hit.GetActor(),ActualDamage,EyeLocation,Hit,GetInstigatorController(),this,DamageType);
+			UGameplayStatics::ApplyPointDamage(Hit.GetActor(),ActualDamage,EyeLocation,Hit,MyOwner->GetInstigatorController(),this,DamageType);
 		}
 		//Debug控制
 		if(DebugWeaponDrawing>0)

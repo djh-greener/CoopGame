@@ -2,13 +2,15 @@
 
 
 #include "Components/SHealthComponent.h"
+
+#include "SGameMode.h"
 #include "CoopGame/CoopGame.h"
 #include "Net/UnrealNetwork.h"
 // Sets default values for this component's properties
 USHealthComponent::USHealthComponent()
 {
 	DefaultHealth=100;
-
+	bIsDead=false;
 	SetIsReplicated(true);
 }
 
@@ -38,16 +40,31 @@ void USHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void USHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                             AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage<=0)
+	if (bIsDead)
 		return;
 	Health=FMath::Clamp(Health-Damage,0.f,DefaultHealth);
+	bIsDead=Health<=0;
 	DDH::Warning()<<"Health :"<<Health<<DDH::Endl();
 	OnHealthChanged.Broadcast(this,Health,Damage,DamageType,InstigatedBy,DamageCauser);
+	if (bIsDead)
+	{
+		ASGameMode*GM=Cast<ASGameMode>(GetWorld()->GetAuthGameMode());
+		if(GM)
+		{
+			if(!InstigatedBy)UE_LOG(LogTemp,Error,TEXT("InstigatedBy==nullptr!"));
+			GM->OnActorKilled.Broadcast(GetOwner(),DamageCauser,InstigatedBy);
+		}
+	}
 }
 
 void USHealthComponent::On_RepHealth(float OldHealth)
 {
 	OnHealthChanged.Broadcast(this,Health,OldHealth-Health,nullptr,nullptr,nullptr);
+}
+
+float USHealthComponent::GetHealth() const
+{
+	return Health;
 }
 
 void USHealthComponent::Heal(float Amount)
