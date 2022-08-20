@@ -59,9 +59,6 @@ protected:
 protected://武器，开火相关
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void StartFire();
-	void StopFire();
-
 	UPROPERTY(Replicated)
 	ASWeapon*CurrentWeapon;
 	
@@ -75,6 +72,11 @@ public://Buff相关 //组件指针不必设Replicated,会自动同步
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Buff")
 	class UBuffManager*BuffManager;
 	
+	UFUNCTION(BlueprintCallable,Category="Player")
+	void StartFire();
+	
+	UFUNCTION(BlueprintCallable,Category="Player")
+    void StopFire();
 public://其他
 	virtual FVector GetPawnViewLocation() const override;
 };
