@@ -4,6 +4,7 @@
 #include "Components/SHealthComponent.h"
 
 #include "CoopGame/CoopGame.h"
+#include "GamePlay/SGameMode.h"
 #include "Net/UnrealNetwork.h"
 // Sets default values for this component's properties
 USHealthComponent::USHealthComponent()
@@ -46,6 +47,12 @@ void USHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, 
 	DDH::Warning()<<"Health :"<<Health<<DDH::Endl();
 	OnHealthChanged.Broadcast(this,Health,Damage,DamageType,InstigatedBy,DamageCauser);
 
+	if (bIsDead)
+	{
+		ASGameMode* GM = Cast<ASGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM)
+			GM->OnActorKilled.Broadcast(GetOwner(), DamageCauser, InstigatedBy);
+	}
 }
 
 void USHealthComponent::On_RepHealth(float OldHealth)
